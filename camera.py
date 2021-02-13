@@ -19,10 +19,11 @@ class Camera:
 		self.__camera.capture(name)
 
 	def take_continuous(self):
-                stream.seek(0)
-                stream.truncate()
-		self.__camera.capture_continuous(self.__stream,format='jpeg')
-		self.__stream.seek(0)
-		frame = self.__stream.read()
-		print('value: ' + str(frame))
-		return frame
+		for i in self.__camera.capture_continuous(self.__stream, 'jpeg', use_video_port=True):
+			self.__stream.seek(0)
+			image_as_bytes = self.__stream.read()
+			self.__stream.seek(0)
+			self.__stream.truncate()
+			yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + image_as_bytes + b'\r\n\r\n')
+
+

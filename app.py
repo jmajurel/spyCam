@@ -14,12 +14,8 @@ def camera_route_handler():
 	my_camera.take_picture(file_name)
 	return send_file(file_name, mimetype='image/jpeg')
 
-
 @app.route("/camera")
 def camera_handler():
-	return Response(gen(my_camera), mimetype='multipart/x-mixed-replace; boundary=frame')
+	my_camera.warm_up()
+	return Response(my_camera.take_continuous(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-
-def gen(camera):
-	while True:
-        	yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + my_camera.take_continuous() + b'\r\n\r\n')
